@@ -1,240 +1,177 @@
 import os
-import re
 
-# 1. Список услуг (названия файлов будут сгенерированы автоматически)
-services_list = [
-    "Dental Implants",
-    "All-on-4 Implants",
-    "Dental Crowns",
-    "Dental Bridges",
-    "Dentures",
-    "Invisalign",
-    "Teeth Whitening",
-    "Dental Sealants",
-    "Dental Bonding",
-    "Porcelain Veneers",
-    "Braces",
-    "Gum Graft",
-    "Root Canal",
-    "Pediatric Dentistry",
-    "Emergency Dentist",
-    "Dental Fillings",
-    "Dental X-Rays",
-    "Tooth Extraction",
-    "Sedation Dentistry",
-    "TMJ Therapy",
-    "Bruxism Treatment",
-    "Sleep Apnea"
-]
+# --- 1. CSS стили для боковых кнопок ---
+# Мы используем переменные цветов из вашего style.css
+css_to_append = """
+/* --- SIDE STICKY CTA BUTTONS --- */
+.side-cta-panel {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
-# 2. Текст-рыба (Lorem Ipsum)
-lorem_short = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-lorem_long = "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."
+.side-cta-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 50px; /* Свернутое состояние (только иконка) */
+    height: 50px;
+    color: white;
+    border-radius: 10px 0 0 10px;
+    overflow: hidden;
+    transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.3s;
+    box-shadow: -2px 4px 15px rgba(0,0,0,0.15);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    position: relative;
+}
 
-# 3. Чтение исходного index.html для извлечения общих частей
-try:
-    with open("index.html", "r", encoding="utf-8") as f:
-        index_content = f.read()
-except FileNotFoundError:
-    print("ОШИБКА: Файл index.html не найден. Пожалуйста, положите скрипт в папку с сайтом.")
-    exit()
+.side-cta-btn:hover {
+    width: 180px; /* Развернутое состояние */
+    padding-right: 15px;
+}
 
-# --- Извлечение частей ---
+.side-cta-btn i {
+    min-width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    position: relative;
+    z-index: 2;
+}
 
-# Извлекаем <head> (метатеги, стили)
-# Мы немного модифицируем head, чтобы добавить стили для внутренних страниц
-head_match = re.search(r"<head>(.*?)</head>", index_content, re.DOTALL)
-head_content = head_match.group(1) if head_match else ""
+.side-cta-btn span {
+    font-family: var(--font-subheading, sans-serif);
+    font-weight: 600;
+    font-size: 0.9rem;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: 0.3s;
+}
 
-# Добавляем CSS специально для внутренних страниц (Internal Hero)
-internal_css = """
-    <style>
-        /* Specific Styles for Generated Pages */
-        .internal-hero {
-            position: relative;
-            height: 40vh;
-            min-height: 400px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            margin-top: -80px; /* Counteract sticky header spacing */
-            padding-top: 80px;
-            overflow: hidden;
-        }
-        .internal-hero::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.2;
-            mix-blend-mode: overlay;
-        }
-        .internal-hero-content {
-            position: relative;
-            z-index: 2;
-            color: white;
-            padding: 0 20px;
-        }
-        .internal-hero h1 {
-            color: white;
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-        }
-        .breadcrumbs {
-            font-family: var(--font-subheading);
-            font-size: 0.9rem;
-            color: var(--secondary-gold);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .breadcrumbs a { color: rgba(255,255,255,0.7); }
-        .breadcrumbs a:hover { color: white; }
-    </style>
+.side-cta-btn:hover span {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Цвета */
+.side-btn-book {
+    background: var(--secondary-gold, #C6A868);
+}
+.side-btn-book:hover {
+    background: #bfa060;
+}
+
+.side-btn-call {
+    background: var(--primary-blue, #0F2C59);
+}
+.side-btn-call:hover {
+    background: var(--primary-dark, #07162e);
+}
+
+/* Мобильная адаптация: кнопки всегда видны, но могут быть меньше или внизу */
+@media (max-width: 768px) {
+    .side-cta-panel {
+        top: auto;
+        bottom: 90px; /* Чуть выше чат-виджета */
+        right: 15px;
+        flex-direction: column-reverse;
+        transform: none;
+        gap: 15px;
+    }
+    .side-cta-btn {
+        width: 45px !important; /* На мобильном всегда только иконки */
+        height: 45px;
+        border-radius: 50%; /* Круглые на мобильном */
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .side-cta-btn span { display: none; }
+}
 """
 
-# Извлекаем Header (Навигация)
-header_match = re.search(r"(<header class=\"main-header\">.*?</header>)", index_content, re.DOTALL)
-header_content = header_match.group(1) if header_match else ""
+# --- 2. HTML шаблон кнопок ---
+# {link_prefix} будет заменен на "" или "index.html"
+html_template = """
+    <!-- SIDE STICKY CTA -->
+    <div class="side-cta-panel">
+        <a href="{link_prefix}#appointment" class="side-cta-btn side-btn-book" title="Book Appointment">
+            <i class="fas fa-calendar-check"></i>
+            <span>Book Online</span>
+        </a>
+        <a href="tel:5715417977" class="side-cta-btn side-btn-call" title="Call Us">
+            <i class="fas fa-phone-alt"></i>
+            <span>Call Now</span>
+        </a>
+    </div>
+"""
 
-# В навигации нужно заменить ссылки якоря (#about) на полные (index.html#about),
-# так как мы будем на другой странице
-header_content = header_content.replace('href="#', 'href="index.html#')
-# Логотип должен вести на главную
-header_content = header_content.replace('href="#" class="logo"', 'href="index.html" class="logo"')
+def update_css():
+    """Добавляет CSS в конец файла style.css"""
+    if not os.path.exists("style.css"):
+        print("Ошибка: style.css не найден.")
+        return
 
-# Извлекаем Footer
-footer_match = re.search(r"(<footer.*</footer>)", index_content, re.DOTALL)
-footer_content = footer_match.group(1) if footer_match else ""
-# Исправляем ссылки в футере тоже
-footer_content = footer_content.replace('href="#', 'href="index.html#')
+    with open("style.css", "r", encoding="utf-8") as f:
+        content = f.read()
 
-# Извлекаем виджеты (Accessibility, Chat) и скрипты в конце body
-# Ищем все от конца футера до закрывающего body
-widgets_match = re.search(r"</footer>(.*?)</body>", index_content, re.DOTALL)
-widgets_scripts = widgets_match.group(1) if widgets_match else ""
-# Ссылки в скриптах менять не надо, так как файлы лежат в той же папке
+    if "SIDE STICKY CTA BUTTONS" in content:
+        print("  ! CSS для боковых кнопок уже есть в style.css (пропуск)")
+    else:
+        with open("style.css", "a", encoding="utf-8") as f:
+            f.write("\n" + css_to_append)
+        print("  ✓ CSS успешно добавлен в style.css")
 
-# 4. Функция генерации страницы
-def generate_page(service_name):
-    # Создаем имя файла (slug)
-    slug = service_name.lower().replace(" ", "-") + ".html"
+def update_html_files():
+    """Проходит по всем .html файлам и добавляет кнопки перед закрывающим тегом body"""
+    # Находим все HTML файлы в текущей директории
+    files = [f for f in os.listdir('.') if f.endswith('.html')]
 
-    # HTML Шаблон
-    html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    {head_content}
-    <title>{service_name} | Lorton Dentist VA</title>
-    <meta name="description" content="Professional {service_name} services in Lorton, VA. Top rated dental care for your family.">
-    {internal_css}
-</head>
-<body>
+    count = 0
+    for filename in files:
+        with open(filename, "r", encoding="utf-8") as f:
+            content = f.read()
 
-    {header_content}
+        # Проверяем, не добавлены ли уже кнопки
+        if "side-cta-panel" in content:
+            print(f"  - Пропуск {filename}: кнопки уже есть.")
+            continue
 
-    <main>
-        <section class="internal-hero">
-            <div class="internal-hero-content fade-in-up">
-                <div class="breadcrumbs">
-                    <a href="index.html">Home</a> <i class="fas fa-chevron-right" style="font-size: 0.7em; margin: 0 10px;"></i> <span>Services</span>
-                </div>
-                <h1>{service_name}</h1>
-                <p style="color: rgba(255,255,255,0.9); max-width: 600px; margin: 0 auto;">
-                    Professional dental care designed for your comfort and long-term health.
-                </p>
-                <a href="index.html#appointment" class="btn btn-pulse" style="margin-top: 30px;">Book Appointment</a>
-            </div>
-        </section>
+        # Логика ссылок:
+        # Если мы в index.html, ссылка на запись -> #appointment
+        # Если мы в других файлах (sub-pages), ссылка -> index.html#appointment
+        link_prefix = "" if filename == "index.html" else "index.html"
 
-        <section class="container split-section fade-in-up" style="padding: 80px 24px;">
-            <div class="split-text">
-                <h3 class="section-tag">Overview</h3>
-                <h2>About {service_name}</h2>
-                <div class="divider align-left"></div>
-                <p>{lorem_short}</p>
-                <p>{lorem_long}</p>
+        # Формируем HTML с правильной ссылкой
+        cta_html = html_template.format(link_prefix=link_prefix)
 
-                <ul class="feature-list">
-                    <li><i class="fas fa-check"></i> Comprehensive exam included</li>
-                    <li><i class="fas fa-check"></i> Latest dental technology</li>
-                    <li><i class="fas fa-check"></i> Experienced specialists</li>
-                </ul>
-            </div>
-            <div class="split-img-wrapper">
-                <div class="split-img">
-                    <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=800&q=80"
-                         alt="{service_name}" width="600" height="400">
-                </div>
-            </div>
-        </section>
+        # Вставляем перед скриптами или закрывающим body
+        # Пытаемся вставить перед подключением main.js, чтобы скрипты шли после HTML
+        if '<script src="main.js">' in content:
+             new_content = content.replace('<script src="main.js">', f'{cta_html}\n    <script src="main.js">')
+        elif "</body>" in content:
+            new_content = content.replace("</body>", f"{cta_html}\n</body>")
+        else:
+            print(f"  ! Ошибка в {filename}: не найден тег </body> или подключение скрипта")
+            continue
 
-        <section class="bg-grey" style="padding: 80px 0;">
-            <div class="container fade-in-up">
-                <div class="text-center" style="max-width: 800px; margin: 0 auto;">
-                    <h3 class="section-tag">Procedure</h3>
-                    <h2>What to Expect</h2>
-                    <div class="divider"></div>
-                    <p>{lorem_long}</p>
-                </div>
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(new_content)
 
-                <div class="services-modern-grid" style="margin-top: 50px;">
-                    <div class="special-card" style="background: white; color: var(--text-main); border: 1px solid #eee;">
-                        <div class="card-icon"><i class="fas fa-user-md"></i></div>
-                        <h4 style="color: var(--primary-blue);">Consultation</h4>
-                        <p style="color: var(--text-light);">We start with a thorough examination to determine the best course of action for your specific needs.</p>
-                    </div>
-                    <div class="special-card" style="background: white; color: var(--text-main); border: 1px solid #eee;">
-                        <div class="card-icon"><i class="fas fa-tools"></i></div>
-                        <h4 style="color: var(--primary-blue);">Treatment</h4>
-                        <p style="color: var(--text-light);">{lorem_short[:100]}...</p>
-                    </div>
-                    <div class="special-card" style="background: white; color: var(--text-main); border: 1px solid #eee;">
-                        <div class="card-icon"><i class="fas fa-smile"></i></div>
-                        <h4 style="color: var(--primary-blue);">Aftercare</h4>
-                        <p style="color: var(--text-light);">We provide detailed instructions to ensure a quick recovery and lasting results.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+        print(f"  ✓ Обновлен файл: {filename}")
+        count += 1
 
-        <section class="bg-blue text-white" style="padding: 80px 0; text-align: center; position: relative; overflow: hidden;">
-            <div class="bg-circle"></div>
-            <div class="container fade-in-up" style="position: relative; z-index: 2;">
-                <h3 class="section-tag white">Take the Next Step</h3>
-                <h2 class="text-white">Ready for a Healthy Smile?</h2>
-                <div class="divider bg-white" style="opacity: 0.8;"></div>
-                <p class="text-white" style="max-width: 600px; margin: 0 auto 40px;">
-                    Schedule your visit for {service_name} today. We are accepting new patients in Lorton, VA.
-                </p>
-                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-                    <a href="index.html#appointment" class="btn btn-gold-solid">Book Appointment</a>
-                    <a href="tel:5715417977" class="btn btn-white-outline">Call 571-541-7977</a>
-                </div>
-            </div>
-        </section>
+    print(f"\nВсего обновлено HTML файлов: {count}")
 
-    </main>
-
-    {footer_content}
-    {widgets_scripts}
-
-</body>
-</html>
-    """
-
-    # Записываем файл
-    with open(slug, "w", encoding="utf-8") as f:
-        f.write(html)
-
-    print(f"✓ Создана страница: {slug}")
-
-# 5. Запуск цикла
-print("Начинаю генерацию страниц...")
-for service in services_list:
-    generate_page(service)
-
-print("\nГотово! Все страницы сгенерированы.")
+# --- Запуск ---
+print("Начинаю добавление боковых CTA кнопок...")
+update_css()
+update_html_files()
+print("Готово! Кнопки добавлены.")
