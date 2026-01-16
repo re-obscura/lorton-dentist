@@ -4,6 +4,18 @@ function toggleMenu() {
     menu.classList.toggle('active');
 }
 
+// Close mobile menu when a link is clicked (UX improvement)
+document.addEventListener('DOMContentLoaded', () => {
+    const mobileLinks = document.querySelectorAll('.mobile-menu a');
+    const menu = document.getElementById('mobileMenu');
+
+    mobileLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            menu.classList.remove('active');
+        });
+    });
+});
+
 // 2. Google Translate Init
 function googleTranslateElementInit() {
     new google.translate.TranslateElement({
@@ -38,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentIndex = 0;
     let autoPlayInterval;
 
+    // Initialize dots
     slides.forEach((_, index) => {
         const dot = document.createElement('div');
         dot.classList.add('modern-dot');
@@ -53,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateDots(index) {
         dots.forEach(d => d.classList.remove('active'));
-        dots[index].classList.add('active');
+        if(dots[index]) dots[index].classList.add('active');
     }
 
     function goToSlide(index) {
@@ -71,15 +84,19 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDots(currentIndex);
     }
 
-    nextButton.addEventListener('click', () => {
-        goToSlide(currentIndex + 1);
-        resetAutoPlay();
-    });
+    if(nextButton) {
+        nextButton.addEventListener('click', () => {
+            goToSlide(currentIndex + 1);
+            resetAutoPlay();
+        });
+    }
 
-    prevButton.addEventListener('click', () => {
-        goToSlide(currentIndex - 1);
-        resetAutoPlay();
-    });
+    if(prevButton) {
+        prevButton.addEventListener('click', () => {
+            goToSlide(currentIndex - 1);
+            resetAutoPlay();
+        });
+    }
 
     function startAutoPlay() {
         autoPlayInterval = setInterval(() => {
@@ -92,17 +109,18 @@ document.addEventListener('DOMContentLoaded', () => {
         startAutoPlay();
     }
 
+    // Touch Support for Swipe
     let touchStartX = 0;
     let touchEndX = 0;
 
     track.addEventListener('touchstart', e => {
         touchStartX = e.changedTouches[0].screenX;
-    });
+    }, {passive: true});
 
     track.addEventListener('touchend', e => {
         touchEndX = e.changedTouches[0].screenX;
         handleSwipe();
-    });
+    }, {passive: true});
 
     function handleSwipe() {
         if (touchEndX < touchStartX - 50) {
@@ -116,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.addEventListener('resize', () => {
+        // Recalculate slide position on resize
         goToSlide(currentIndex);
     });
 
@@ -124,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 4. Scroll Animations
 const observerOptions = {
-    threshold: 0.15,
+    threshold: 0.1, // Trigger slightly earlier for better mobile feel
     rootMargin: "0px 0px -50px 0px"
 };
 
@@ -217,5 +236,13 @@ function resetAccessibility() {
 // 9. FAQ Toggle Logic
 function toggleFAQ(element) {
     const item = element.parentElement;
+
+    // Close others (Accordion style - optional, better for mobile)
+    /* const allItems = document.querySelectorAll('.faq-item');
+    allItems.forEach(i => {
+        if(i !== item) i.classList.remove('active');
+    });
+    */
+
     item.classList.toggle('active');
 }
